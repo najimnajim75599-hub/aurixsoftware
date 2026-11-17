@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AURIX — Your World, Connected.</title>
+<meta name="description" content="AURIX is a free, local-first desktop workspace that connects your notes, ideas, projects and files. Private by design. Works offline.">
+<meta name="theme-color" content="#080808">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --black:#080808; --ink:#111; --panel:#121212; --panel2:#1a1a1a; --line:#262626;
+  --crimson:#780D18; --red:#C51F32; --yellow:#F5C518; --yellow-d:#d9ac0c;
+  --white:#fff; --muted:#a8a8a8; --soft:#d6d6d6;
+  --radius:12px; --max:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--black);color:var(--white);font:16px/1.65 "Segoe UI",Inter,system-ui,-apple-system,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--yellow);text-decoration:none} a:hover{color:#fff}
+img{max-width:100%}
+h1,h2,h3{line-height:1.15;margin:0 0 .5em;letter-spacing:-.02em}
+h1{font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800}
+h2{font-size:clamp(1.7rem,3.4vw,2.4rem);font-weight:750}
+h3{font-size:1.15rem;font-weight:650}
+p{margin:0 0 1em;color:var(--soft)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+.eyebrow{display:inline-block;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--yellow);font-weight:700;margin-bottom:14px}
+.y{color:var(--yellow)}
+
+/* header */
+.announce{background:var(--crimson);color:#fff;text-align:center;padding:8px 16px;font-size:.9rem}
+header.top{position:sticky;top:0;z-index:50;background:rgba(8,8,8,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.28em;font-size:1.1rem}
+
+.menu{display:flex;gap:6px;align-items:center}
+.menu a{color:var(--soft);padding:8px 14px;border-radius:8px;font-size:.95rem}
+.menu a:hover,.menu a.active{color:#fff;background:var(--panel2)}
+.menu a.active{box-shadow:inset 0 -2px 0 var(--red)}
+.burger{display:none;background:none;border:1px solid var(--line);color:#fff;border-radius:8px;padding:8px 12px;font-size:1rem;cursor:pointer}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:10px;padding:13px 24px;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .15s,background .15s,border-color .15s,color .15s;font-family:inherit}
+.btn:active{transform:translateY(1px)}
+.btn-yellow{background:var(--yellow);color:#111} .btn-yellow:hover{background:#ffd633;color:#111}
+.btn-red{background:var(--red);color:#fff} .btn-red:hover{background:#a8192a;color:#fff}
+.btn-ghost{background:transparent;color:#fff;border-color:#3a3a3a} .btn-ghost:hover{border-color:var(--yellow);color:var(--yellow)}
+.btn-danger{background:transparent;color:#ff7b8a;border-color:#5a1a22} .btn-danger:hover{background:var(--crimson);color:#fff}
+.btn-sm{padding:7px 14px;font-size:.88rem;border-radius:8px}
+
+/* hero */
+.hero{position:relative;padding:84px 0 70px;overflow:hidden;background:
+  radial-gradient(900px 420px at 80% -10%,rgba(197,31,50,.28),transparent 60%),
+  linear-gradient(var(--black),var(--black))}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.35;mask-image:linear-gradient(#000 0%,transparent 80%)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center}
+.hero p.lead{font-size:1.2rem;max-width:34em;color:var(--soft)}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin:28px 0 14px}
+.hero .meta{color:var(--muted);font-size:.9rem}
+.underline{background:linear-gradient(var(--yellow),var(--yellow)) 0 92%/100% 5px no-repeat;padding-bottom:4px}
+
+/* app mockup */
+.mock{background:#fff;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px #333;overflow:hidden;color:#080808;display:grid;grid-template-columns:150px 1fr;min-height:330px;transform:perspective(1200px) rotateY(-6deg) rotateX(2deg);transition:transform .4s}
+.mock:hover{transform:none}
+.mock .side{background:#080808;padding:16px 12px;display:flex;flex-direction:column;gap:6px}
+.mock .side b{color:#fff;letter-spacing:.25em;font-size:.8rem;margin-bottom:12px}
+.mock .side span{color:#c5c5c5;font-size:.72rem;padding:7px 9px;border-radius:7px}
+.mock .side span.on{background:#C51F32;color:#fff;font-weight:600}
+.mock .main{padding:18px}
+.mock h4{margin:0 0 10px;font-size:1.05rem}
+.mock .bar{background:#f2f2f2;border-radius:8px;height:30px;margin-bottom:12px;display:flex;align-items:center;padding:0 10px;color:#888;font-size:.72rem}
+.mock .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mock .cards div{border:1px solid #e4e4e4;border-radius:8px;padding:8px 10px;font-size:.66rem;color:#6b6b6b}
+.mock .cards b{display:block;color:#C51F32;font-size:1.2rem}
+.mock .rows div{border-bottom:1px solid #f0f0f0;padding:6px 2px;font-size:.72rem;display:flex;justify-content:space-between}
+.mock .rows i{font-style:normal;color:#780D18;font-size:.66rem}
+
+/* sections */
+section{padding:84px 0}
+section.alt{background:var(--panel);border-block:1px solid var(--line)}
+.center{text-align:center} .center p{margin-inline:auto;max-width:40em}
+.grid{display:grid;gap:20px}
+.g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:border-color .2s,transform .2s}
+section.alt .card{background:var(--black)}
+.card:hover{border-color:var(--red);transform:translateY(-3px)}
+.card p{margin:0;color:var(--muted);font-size:.96rem}
+.icon{width:44px;height:44px;border-radius:10px;background:rgba(197,31,50,.14);display:grid;place-items:center;margin-bottom:16px}
+.icon svg{width:24px;height:24px;stroke:var(--yellow);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.num{color:var(--yellow);font-weight:800;font-size:2.2rem;line-height:1}
+.steps .card .num{margin-bottom:10px}
+.stats{display:flex;gap:40px;flex-wrap:wrap}
+.stats div b{display:block;font-size:1.8rem;color:#fff}
+.stats div span{color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;background:rgba(245,197,24,.12);color:var(--yellow);border:1px solid rgba(245,197,24,.35);border-radius:99px;padding:3px 12px;font-size:.78rem;font-weight:700}
+.badge.red{background:rgba(197,31,50,.15);color:#ff8d9a;border-color:rgba(197,31,50,.4)}
+.badge.gray{background:#1d1d1d;color:var(--muted);border-color:#333}
+.band{background:linear-gradient(120deg,var(--crimson),#3b060c);border-radius:18px;padding:48px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.band p{color:#f0d5d9;margin:0}
+
+/* download */
+.dl{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start}
+.dl-main{border:1px solid var(--red);background:linear-gradient(180deg,#1a0a0d,var(--panel));border-radius:16px;padding:34px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:.92rem;margin:18px 0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;word-break:break-all}
+code,.mono{font-family:Consolas,"Cascadia Mono",monospace;font-size:.82rem;background:#1b1b1b;border:1px solid #2c2c2c;border-radius:6px;padding:2px 6px}
+.hashrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+ol.clean{padding-left:1.2em;color:var(--soft)} ol.clean li{margin-bottom:.5em}
+.notice{border-left:3px solid var(--yellow);background:#17140a;padding:14px 18px;border-radius:0 10px 10px 0;color:var(--soft);font-size:.93rem}
+table.t{width:100%;border-collapse:collapse} table.t td,table.t th{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:.93rem;vertical-align:top}
+table.t th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:10px}
+details summary{cursor:pointer;font-weight:650} details[open]{border-color:var(--red)} details p{margin:12px 0 0}
+.timeline .rel{border-left:2px solid var(--line);padding:0 0 34px 26px;position:relative}
+.timeline .rel:before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px var(--black)}
+pre.notes{white-space:pre-wrap;font:inherit;color:var(--soft);margin:8px 0 0}
+
+/* forms */
+label{display:block;font-weight:600;font-size:.9rem;margin:16px 0 6px}
+input[type=text],input[type=email],input[type=password],input[type=file],select,textarea{width:100%;background:#0e0e0e;color:#fff;border:1px solid #333;border-radius:9px;padding:12px 14px;font:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--yellow);outline-offset:1px;border-color:var(--yellow)}
+textarea{min-height:150px;resize:vertical}
+.hp{position:absolute;left:-9999px;opacity:0}
+.flash{border-radius:10px;padding:12px 16px;margin:0 0 16px;font-size:.95rem}
+.flash.error{background:#2a0e13;border:1px solid #6b1822;color:#ffb3bc}
+.flash.success{background:#10230f;border:1px solid #2c5a2a;color:#b8f0b4}
+.check{display:flex;gap:10px;align-items:center;font-weight:500} .check input{width:auto}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:48px 0 30px;color:var(--muted);font-size:.92rem}
+footer .cols{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:28px}
+footer a{color:var(--soft)} footer a:hover{color:var(--yellow)}
+footer .links{display:flex;gap:18px;flex-wrap:wrap}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:900px){
+  .hero .wrap{grid-template-columns:minmax(0,1fr);gap:36px}
+  .mock{width:100%;max-width:760px;transform:none}
+  .g4,.g2,.dl{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:680px){
+  .wrap{padding-inline:18px}
+  header.top .nav{position:relative;height:64px}
+  .burger{display:block}
+  .menu{display:none;position:absolute;top:calc(100% - 1px);left:0;right:0;z-index:60;flex-direction:column;align-items:stretch;gap:2px;padding:8px;background:#111;border:1px solid var(--line);border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+  .menu.open{display:flex}
+  .menu a{width:100%;padding:10px 12px}
+  .hero{padding:58px 0 48px}
+  .hero .wrap{grid-template-columns:minmax(0,1fr);gap:30px}
+  .mock{min-width:0;grid-template-columns:minmax(92px,30%) minmax(0,1fr)}
+  .mock .main{min-width:0;padding:12px}
+  .mock .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .mock .cards div{min-width:0;padding:7px 5px}
+  .mock .rows div{gap:6px;min-width:0}
+  .mock .rows i{text-align:right}
+  .g3,.g4,.g2,.g2e,.dl{grid-template-columns:minmax(0,1fr)}
+  section{padding:60px 0}
+  .band{padding:28px}
+  .dl-main{padding:24px}
+  footer .cols{gap:20px}
+}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.mock{transform:none}html{scroll-behavior:auto}}
+
+
+section[id]{scroll-margin-top:70px}.menu a.btn{color:#111}
+
+.brand .logo{height:30px;width:auto}
+</style></head><body>
+
+<header class="top"><div class="wrap nav">
+  <a class="brand" href="#home" aria-label="AURIX home"><svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <polygon points="42,66 60,10 78,66 69,66 60,38 51,66" fill="#FFFFFF"/>
+  <path d="M14 56 C 30 44, 78 34, 104 24 C 112 21, 112 30, 100 38 C 80 52, 34 66, 18 62 C 12 60, 11 58, 14 56 Z M 24 58 C 40 56, 84 44, 98 32 C 80 38, 40 52, 24 58 Z" fill="#C51F32" fill-rule="evenodd"/>
+</svg>
+AURIX</a>
+  <button class="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  <nav class="menu"><a href="#home" data-site-key="nav_home">Home</a><a href="#features" data-site-key="nav_features">Features</a><a href="#privacy" data-site-key="nav_privacy">Privacy</a><a href="#contact" data-site-key="nav_contact">Contact</a><a href="profile.html" data-site-key="nav_developer">Developer</a><a class="btn btn-yellow btn-sm" href="#download" data-site-key="nav_download">Download</a></nav>
+</div></header>
+
+<section class="hero" id="home"><div class="wrap">
+  <div>
+    <span class="eyebrow" id="heroEyebrow">Intelligent digital ecosystem</span>
+    <h1 id="heroTitle">Your World,<br><span class="underline">Connected.</span></h1>
+    <p class="lead" id="heroLead">AURIX brings your notes, ideas, projects and files into one private workspace on your own computer. Understand your digital world instead of just storing it.</p>
+    <div class="cta"><a class="btn btn-yellow" id="heroPrimary" href="#download">⬇ Download for Windows</a><a class="btn btn-ghost" id="heroSecondary" href="#features">Explore features</a></div>
+    <div class="meta">Free · Works offline · No account needed</div>
+  </div>
+  <div class="mock" aria-hidden="true">
+    <div class="side"><b>AURIX</b><span class="on">Home</span><span>Memory</span><span>Find</span><span>Flow</span><span>Connect</span><span>Activity</span></div>
+    <div class="main"><h4>Good morning</h4><div class="bar">⌕ &nbsp;Search by description, not just filename…</div>
+      <div class="cards"><div><b>24</b>Notes &amp; ideas</div><div><b>1,280</b>Indexed files</div><div><b>5</b>Projects</div></div>
+      <div class="rows"><div>Website launch <i>In progress · 62%</i></div><div>Logo_final_v3.png <i>Image</i></div><div>Task completed: Write README <i>09:41</i></div></div></div>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <div class="center reveal"><span class="eyebrow">Everything in one place</span><h2>Six sections. One connected workspace.</h2><p>Each part of AURIX does one job well, and they all talk to each other.</p></div>
+  <div class="grid g3" style="margin-top:44px"><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div><h3>Memory</h3><p>Save notes and ideas, add tags, mark what matters and search everything instantly.</p></div><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg></div><h3>Find</h3><p>Search files you choose by name, type, tag or your own description. Honest keyword search, not fake AI.</p></div><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/></svg></div><h3>Flow</h3><p>Turn ideas into projects with tasks, deadlines, progress and attached notes and files.</p></div><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l8 1M7.5 8l3 8M16.5 10l-3 6"/></svg></div><h3>Connect</h3><p>See how files, projects, notes, ideas and tasks relate in an interactive knowledge graph.</p></div><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h3>Activity</h3><p>A clean timeline of what changed and when. You control what is recorded.</p></div><div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><h3>Private by design</h3><p>Local database, no cloud, no tracking, no uploads. Backup and restore in one click.</p></div></div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <div class="center reveal"><span class="eyebrow">Get started in minutes</span><h2>Three simple steps</h2></div>
+  <div class="grid g3 steps" style="margin-top:44px">
+    <div class="card reveal"><div class="num">01</div><h3>Download</h3><p>Get AURIX for Windows. Free, and it works without internet.</p></div>
+    <div class="card reveal"><div class="num">02</div><h3>Choose your folders</h3><p>Pick only the folders you want indexed. AURIX reads names, sizes and dates, never file contents.</p></div>
+    <div class="card reveal"><div class="num">03</div><h3>Connect your world</h3><p>Write notes, plan projects and link everything in the knowledge graph.</p></div>
+  </div>
+  <h2 style="margin-top:64px">System requirements</h2>
+  <table class="t"><tr><th>System</th><td>Windows 10 or 11 (64-bit)</td></tr><tr><th>Memory</th><td>4 GB minimum, 8 GB recommended</td></tr><tr><th>Graphics</th><td>Integrated graphics are fine</td></tr><tr><th>Internet</th><td>Not required</td></tr></table>
+</div></section>
+
+<section id="download"><div class="wrap">
+  <span class="eyebrow">Download</span><h2>Get <span class="y">AURIX</span></h2>
+  <div class="dl-main" style="max-width:640px">
+    <span class="badge" id="dlbadge">Latest</span>
+    <h2 style="margin:14px 0 4px">AURIX for Windows</h2>
+    <p class="muted">Windows 10 / 11 · 64-bit · Free for personal use</p>
+    <a class="btn btn-yellow" id="dlbtn" href="#download">⬇ Download AURIX.exe</a>
+    <p class="small muted" id="dlnote" style="margin-top:14px"></p>
+  </div>
+  <div class="notice" style="margin-top:18px;max-width:640px"><strong>Windows SmartScreen:</strong> AURIX is a new independent app and is not code-signed yet, so Windows may say “Windows protected your PC”. Click <em>More info → Run anyway</em>.</div>
+</div></section>
+
+<section class="alt" id="privacy"><div class="wrap" style="max-width:820px">
+  <span class="eyebrow">Privacy</span><h2>Private by design</h2>
+  <p id="privacyCopy">All your data stays on your computer in a local database. AURIX never uploads files, never sends notes to online AI services, never scans your computer without permission, and only indexes folders you choose. You can pause indexing, remove folders and delete everything from Settings.</p>
+  <div id="faqList"><details><summary>Is it really free?</summary><p>Yes, the core software is free to use.</p></details>
+  <details><summary>How do I back up my data?</summary><p>Settings → Backup and restore → Create backup. You get one file to keep on a USB drive.</p></details></div>
+</div></section>
+
+<section id="contact"><div class="wrap" style="max-width:720px">
+  <span class="eyebrow">Contact</span><h2>Say hello</h2>
+  <p class="muted" id="contactnote">Questions, feedback or bug reports are welcome.</p>
+  <form class="panel" id="cform">
+    <label for="n">Name</label><input id="n" type="text" maxlength="100" required>
+    <label for="e">Your email</label><input id="e" type="email" maxlength="200" required>
+    <label for="m">Message</label><textarea id="m" maxlength="3000" required></textarea>
+    <div style="margin-top:20px"><button class="btn btn-yellow" type="submit">Send message</button></div>
+  </form>
+</div></section>
+
+<footer><div class="wrap"><div class="cols">
+  <div><strong style="color:#fff;letter-spacing:.25em">AURIX</strong><br><span id="footerTagline">Your World, Connected.</span><br><span class="small" id="footerNote">Free · Local-first · Private</span></div>
+  <div class="links"><a href="#features" data-site-key="nav_features">Features</a><a href="#download" data-site-key="nav_download">Download</a><a href="#privacy" data-site-key="nav_privacy">Privacy</a><a href="#contact" data-site-key="nav_contact">Contact</a><a href="profile.html" data-site-key="nav_developer">Developer</a><a id="insta" href="#" target="_blank" rel="noopener" hidden>Instagram</a></div></div>
+  <div class="small">© <span id="yr"></span> AURIX. <span id="footerCopyright">Built by Najimul Islam Ahmed.</span></div></div></footer>
+
+<script>
+/* ======== EDIT THESE THREE LINES ======== */
+const {SUPABASE_URL = "", SUPABASE_ANON_KEY = ""} = window.AURIX_CONFIG || {};   // set in config.js
+let DOWNLOAD_URL = "";   // optional manual fallback link (used only if no release is published)
+let CONTACT_EMAIL = "";  // filled automatically from the admin panel (Website settings)
+let INSTAGRAM_URL = "";
+let DOWNLOAD_NOTE = "";
+/* ======================================== */
+document.getElementById('yr').textContent = new Date().getFullYear();
+const btn = document.getElementById('dlbtn'), note = document.getElementById('dlnote'), badge = document.getElementById('dlbadge');
+let REL = null;
+function setDl(){
+  if (REL || DOWNLOAD_URL) { btn.href = REL ? REL.file_url : DOWNLOAD_URL; btn.setAttribute('download','');
+    btn.textContent = REL ? '⬇ Download AURIX ' + REL.version : '⬇ Download AURIX.exe'; btn.classList.replace('btn-ghost','btn-yellow');
+    badge.textContent = REL ? 'v' + REL.version : 'Latest'; badge.classList.remove('red');
+    note.textContent = DOWNLOAD_NOTE || 'Tip: right-click the file after downloading and check it with your antivirus.';
+    btn.onclick = () => { if (REL && sb) sb.rpc('count_download', {v: REL.version}); };
+  } else { btn.textContent = 'Windows build coming soon'; btn.classList.replace('btn-yellow','btn-ghost'); btn.addEventListener('click', e => e.preventDefault());
+    badge.textContent = 'Coming soon'; badge.classList.add('red'); note.textContent = 'The download will appear here as soon as the Windows build is published.'; }
+}
+let sb = null;
+function applySiteSettings(settings,announcement){
+  const put=(id,key)=>{const value=settings[key];if(value!==undefined&&value!==""){const element=document.getElementById(id);if(element)element.textContent=value}};
+  const seoTitle=settings.seo_title||"AURIX — Your World, Connected.";
+  document.title=seoTitle;
+  if(settings.seo_description){const description=document.querySelector('meta[name="description"]');if(description)description.content=settings.seo_description;}
+  if(settings.seo_keywords){let keywords=document.querySelector('meta[name="keywords"]');if(!keywords){keywords=document.createElement("meta");keywords.name="keywords";document.head.append(keywords);}keywords.content=settings.seo_keywords;}
+  put("heroEyebrow","hero_eyebrow");put("heroLead","hero_lead");put("heroPrimary","hero_cta_primary");put("heroSecondary","hero_cta_secondary");
+  if(settings.hero_title){const parts=settings.hero_title.split("\n",2),title=document.getElementById("heroTitle"),line=document.createElement("span");line.className="underline";line.textContent=parts[1]||"";title.replaceChildren(document.createTextNode(parts[0]),document.createElement("br"),line);}
+  put("privacyCopy","privacy_text");put("footerTagline","footer_tagline");put("footerNote","footer_note");put("footerCopyright","footer_copyright");
+  if(Object.prototype.hasOwnProperty.call(settings,"faqs")){const list=document.getElementById("faqList"),items=settings.faqs.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map(line=>{const separator=line.indexOf("|"),question=document.createElement("summary"),answer=document.createElement("p"),details=document.createElement("details");question.textContent=line.slice(0,separator).trim();answer.textContent=line.slice(separator+1).trim();details.append(question,answer);return details});list.replaceChildren(...items);}
+  CONTACT_EMAIL=settings.contact_email||"";INSTAGRAM_URL=settings.instagram_url||"";DOWNLOAD_NOTE=settings.download_note||"";
+  document.querySelectorAll("[data-site-key]").forEach(link=>{const key=link.dataset.siteKey;if(settings[key])link.textContent=settings[key];});
+  const navKeys=["home","features","privacy","contact","developer","download"];
+  navKeys.forEach(key=>document.querySelectorAll(`[data-site-key="nav_${key}"]`).forEach(link=>{link.hidden=settings[`nav_${key}_visible`]==="false";}));
+  [["features","page_features_visible"],["privacy","page_privacy_visible"],["download","page_download_visible"],["contact","page_contact_visible"]].forEach(([id,key])=>{if(settings[key]==="false")document.getElementById(id).hidden=true;});
+  const featureNames={memory:"Memory",find:"Find",flow:"Flow",connect:"Connect",activity:"Activity"};
+  Object.entries(featureNames).forEach(([key,name])=>{const card=[...document.querySelectorAll("#features .grid.g3 > .card")].find(item=>item.querySelector("h3")?.textContent.trim()===name);if(!card)return;if(settings[`feature_${key}_enabled`]==="false")card.hidden=true;const title=settings[`feature_${key}_title`],description=settings[`feature_${key}_description`];if(title)card.querySelector("h3").textContent=title;if(description)card.querySelector("p").textContent=description;});
+  if(settings.hero_image_url){try{const image=new URL(settings.hero_image_url);if(image.protocol==="https:")document.querySelector(".hero").style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.95),rgba(8,8,8,.68)),url(${JSON.stringify(image.href)})`;}catch{}}
+  const bannerText=settings.banner_text||(announcement?`${announcement.title}${announcement.body?" · "+announcement.body:""}`:"");
+  if(bannerText&&settings.banner_visible!=="false"){const banner=document.createElement("div");banner.className="announce";banner.textContent=bannerText;document.body.prepend(banner);}
+  if(settings.maintenance_mode==="true"){const wall=document.createElement("div");wall.setAttribute("role","alert");wall.style.cssText="position:fixed;inset:0;z-index:1000;display:grid;place-content:center;text-align:center;padding:24px;background:#080808;color:#fff";const heading=document.createElement("h1"),message=document.createElement("p");heading.textContent="AURIX is temporarily offline";message.textContent=settings.maintenance_message||"AURIX is temporarily unavailable while we make updates. Please check back soon.";wall.append(heading,message);document.body.append(wall);}
+}
+async function load(){
+  if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) { try {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const r = await sb.from('releases').select('version,file_url,file_size,notes').eq('published',true).eq('is_latest',true).eq('downloads_enabled',true).eq('platform','windows').maybeSingle();
+    if (r.data) { REL = r.data;
+      if (REL.file_size) note.textContent = ''; }
+    const [st,news] = await Promise.all([sb.from('site_settings').select('*'),sb.from('announcements').select('title,body,publish_at').eq('active',true).lte('publish_at',new Date().toISOString()).order('publish_at',{ascending:false}).limit(1)]);
+    applySiteSettings(Object.fromEntries((st.data||[]).map(x=>[x.key,x.value])),news.data?.[0]);
+  } catch (e) {} }
+  setDl();
+  if (INSTAGRAM_URL) { try { const url=new URL(INSTAGRAM_URL); if(url.protocol==='https:'){const a=document.getElementById('insta');a.href=url.href;a.hidden=false;} } catch {} }
+  if (!CONTACT_EMAIL) { form.style.display = 'none'; document.getElementById('contactnote').textContent = 'Contact form not set up yet.'; } else { form.style.display = ''; }
+}
+const form = document.getElementById('cform');
+load();
+form.addEventListener('submit', e => { e.preventDefault();
+  const n = document.getElementById('n').value.trim(), em = document.getElementById('e').value.trim(), m = document.getElementById('m').value.trim();
+  location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('AURIX message from ' + n) + '&body=' + encodeURIComponent(m + '\n\nReply to: ' + em); });
+const burger = document.querySelector('.burger'), menu = document.querySelector('.menu');
+burger.addEventListener('click', () => { burger.setAttribute('aria-expanded', menu.classList.toggle('open')); });
+menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
+const items = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), {threshold:.12}); items.forEach(i => io.observe(i)); }
+else items.forEach(i => i.classList.add('in'));
+</script>
+</body></html>

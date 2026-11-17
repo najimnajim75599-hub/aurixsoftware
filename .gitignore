@@ -1,0 +1,24 @@
+# Python environments and caches
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+*.py[cod]
+
+# Generated desktop builds and local databases
+AURIX/build/
+AURIX/dist/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db

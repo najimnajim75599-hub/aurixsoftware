@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="refresh" content="0;url=admin.html">
+  <title>AURIX Admin</title>
+  <script>location.replace('admin.html');</script>
+  <link rel="stylesheet" href="admin-local.css">
+</head>
+<body>
+  <p>This browser-local prototype is retired. <a href="admin.html">Open the official AURIX admin panel.</a></p>
+  <div id="authView" aria-live="polite"></div>
+  <div id="appShell" class="hidden">
+    <aside id="sideNav" aria-label="Main navigation">
+      <div class="sidebar-brand"><span class="brand-mark">A</span><div><span class="brand-name">AURIX</span><span class="brand-caption">LOCAL COMMAND CENTER</span></div></div>
+      <p class="nav-section-label">MANAGE</p>
+      <nav id="nav"></nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-local"><span class="status-dot"></span><div><b>Private instance</b><span>Browser storage only</span></div></div>
+      <div class="sidebar-user"><span class="avatar" id="adminAvatar">A</span><div class="sidebar-user-copy"><b id="adminName">Administrator</b><span id="adminEmail"></span></div><button class="icon-button" id="logoutButton" type="button" title="Sign out" aria-label="Sign out">↗</button></div>
+    </aside>
+    <main id="workspace">
+      <header class="topbar">
+        <div class="topbar-left"><button class="button secondary" id="menuButton" type="button" aria-label="Open navigation">☰</button><div><h1 class="page-title" id="pageTitle">Overview</h1><p class="page-subtitle" id="pageSubtitle">Your local operation at a glance.</p></div></div>
+        <div class="topbar-right"><span class="offline-badge"><i class="status-dot"></i> Offline · No APIs</span><div id="pageAction"></div></div>
+      </header>
+      <section id="view" aria-live="polite"><div class="loading-state"><span class="loader"></span><span>Opening local database</span></div></section>
+    </main>
+  </div>
+  <dialog id="recordDialog"><div id="modalContent"></div></dialog>
+  <dialog id="confirmDialog"><div class="confirm-shell"><p class="eyebrow">CONFIRM ACTION</p><h2 id="confirmTitle"></h2><p id="confirmMessage"></p><div class="dialog-actions"><button class="button secondary" id="confirmNo" type="button">Cancel</button><button class="button primary" id="confirmYes" type="button">Continue</button></div></div></dialog>
+  <div id="toastStack" role="status" aria-live="polite"></div>
+</body>
+</html>
