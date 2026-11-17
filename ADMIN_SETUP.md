@@ -2,6 +2,16 @@
 
 The production control panel is `admin.html`. It uses the existing AURIX Supabase project and `config.js`; `admin-local.html` is a separate browser-only prototype and is not the production admin.
 
+## Vercel deployment
+
+The repository root is the static website. `AURIX/` is the separate Python desktop application and must not be used as the Vercel project root.
+
+1. In Vercel, open the project settings and go to **Build and Deployment**.
+2. Set **Root Directory** to `.` (the repository root), not `AURIX/`.
+3. Set **Framework Preset** to **Other**. The root `vercel.json` also selects Other, skips install/build commands, serves the repository root, and maps `/` and `/admin` to the existing HTML pages.
+4. Save the settings and redeploy the latest `main` commit. A failed import created with `path=AURIX` must be corrected to the repository root or recreated with that root.
+5. After deployment, verify `https://<your-domain>/` and `https://<your-domain>/admin`. Add the final admin URL to Supabase Auth's allowed redirect URLs for password recovery.
+
 ## Supabase setup
 
 1. Open the Supabase project referenced by `config.js` and run `aurix_supabase_setup.sql` in the SQL Editor. This creates or updates the admin password-change gate, protected RPCs, and public-read/admin-write policies for site assets.
